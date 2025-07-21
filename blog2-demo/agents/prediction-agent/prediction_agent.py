@@ -10,13 +10,13 @@ import os
 # Add the shared directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
-from base_agent import BaseAgent
+from unified_base_agent import UnifiedBaseAgent
 from models import A2AMessage
 from mcp.tool_registry import mcp_tool
 
 logger = logging.getLogger(__name__)
 
-class PredictionAgent(BaseAgent):
+class PredictionAgent(UnifiedBaseAgent):
     """Agent specialized in forecasting and trend prediction for renewable energy"""
     
     def __init__(self):
@@ -31,7 +31,8 @@ class PredictionAgent(BaseAgent):
                 "scenario analysis",
                 "pattern recognition",
                 "time series analysis"
-            ]
+            ],
+            tags=["prediction", "forecasting", "analytics", "ml"]
         )
         
     @mcp_tool(

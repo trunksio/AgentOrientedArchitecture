@@ -2,19 +2,27 @@
 from typing import Dict, Any, List
 import json
 import logging
-from .base_agent import BaseAgent
+from .unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 
 logger = logging.getLogger(__name__)
 
-class NarrativeAgent(BaseAgent):
+class NarrativeAgent(UnifiedBaseAgent):
     AGENT_TYPE = "narrative"
     
     def __init__(self):
         super().__init__(
             agent_id="narrative-agent-001",
             name="Narrative Agent",
-            description="Generates data-driven stories and explanations"
+            description="Generates data-driven stories and explanations",
+            capabilities=[
+                "Generate data stories",
+                "Create narrative explanations",
+                "Produce insights summaries",
+                "Write trend analysis",
+                "Craft compelling narratives"
+            ],
+            tags=["narrative", "storytelling", "content", "writing"]
         )
     
     def _register_tools(self):

@@ -2,17 +2,25 @@
 import pandas as pd
 import os
 from typing import Dict, Any, List, Optional
-from .base_agent import BaseAgent
+from .unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 
-class DataAgent(BaseAgent):
+class DataAgent(UnifiedBaseAgent):
     AGENT_TYPE = "data"
     
     def __init__(self):
         super().__init__(
             agent_id="data-agent-001",
             name="Data Agent",
-            description="Provides access to renewable energy datasets and performs data analysis"
+            description="Provides access to renewable energy datasets and performs data analysis",
+            capabilities=[
+                "Query renewable energy data",
+                "Analyze energy trends",
+                "Aggregate data by country/year",
+                "Calculate growth rates",
+                "Access to historical data"
+            ],
+            tags=["data", "analytics", "renewable-energy", "statistics"]
         )
         self.data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "renewable_energy.csv")
         self._load_data()

@@ -2,19 +2,27 @@
 from typing import Dict, Any, List, Optional
 import json
 import logging
-from .base_agent import BaseAgent
+from .unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 
 logger = logging.getLogger(__name__)
 
-class GUIAgent(BaseAgent):
+class GUIAgent(UnifiedBaseAgent):
     AGENT_TYPE = "gui"
     
     def __init__(self):
         super().__init__(
             agent_id="gui-agent-001",
             name="GUI Agent",
-            description="Orchestrates other agents and manages the user interface"
+            description="Orchestrates other agents and manages the user interface",
+            capabilities=[
+                "Query orchestration",
+                "Multi-agent coordination",
+                "UI composition",
+                "Agent discovery",
+                "Result aggregation"
+            ],
+            tags=["orchestration", "gui", "coordination", "frontend"]
         )
     
     def _register_tools(self):

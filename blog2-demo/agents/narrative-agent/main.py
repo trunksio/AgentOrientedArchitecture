@@ -1,11 +1,16 @@
-"""Narrative Agent main entry point"""
-import sys
-sys.path.append('/app/shared')
-
 import asyncio
-from agent_runner import AgentRunner
+import sys
+import os
+
+# Add parent directory to path to import shared modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from shared.standard_agent_runner import StandardAgentRunner
 from narrative_agent import NarrativeAgent
 
+async def main():
+    runner = StandardAgentRunner(NarrativeAgent)
+    await runner.run()
+
 if __name__ == "__main__":
-    runner = AgentRunner(NarrativeAgent)
-    asyncio.run(runner.run())
+    asyncio.run(main())

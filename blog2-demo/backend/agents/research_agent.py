@@ -2,19 +2,27 @@
 from typing import Dict, Any, List
 import json
 import logging
-from .base_agent import BaseAgent
+from .unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 
 logger = logging.getLogger(__name__)
 
-class ResearchAgent(BaseAgent):
+class ResearchAgent(UnifiedBaseAgent):
     AGENT_TYPE = "research"
     
     def __init__(self):
         super().__init__(
             agent_id="research-agent-001",
             name="Research Agent",
-            description="Gathers external context and insights about renewable energy"
+            description="Gathers external context and insights about renewable energy",
+            capabilities=[
+                "Research industry trends",
+                "Find policy information",
+                "Gather market insights",
+                "Analyze technology developments",
+                "Provide contextual information"
+            ],
+            tags=["research", "insights", "context", "analysis"]
         )
     
     def _register_tools(self):

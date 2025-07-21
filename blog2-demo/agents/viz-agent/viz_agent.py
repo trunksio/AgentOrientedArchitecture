@@ -2,7 +2,7 @@ import sys
 sys.path.append("/app/shared")
 """Visualization Agent - Creates intelligent charts and visual representations"""
 from typing import Dict, Any, List, Optional
-from base_agent import BaseAgent
+from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 from llm import LLMConfig
 from models import A2AMessage, MessageType
@@ -22,6 +22,16 @@ class VisualizationAgent(BaseAgent):
             llm_config=llm_config
         )
     
+
+    def _get_capabilities(self) -> List[str]:
+        """Get agent capabilities"""
+        return [tool.description for tool in self.get_tools()]
+    
+    def _get_tags(self) -> List[str]:
+        """Get agent tags"""
+        # Override in subclass to provide specific tags
+        return []
+
     def _register_tools(self):
         """Register MCP tools for visualization"""
         # Intelligent visualization tool

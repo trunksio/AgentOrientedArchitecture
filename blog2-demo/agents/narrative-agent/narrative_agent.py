@@ -4,17 +4,17 @@ sys.path.append("/app/shared")
 from typing import Dict, Any, List, Optional
 import json
 import logging
-from base_agent import BaseAgent
+from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 from llm import LLMConfig
 
 logger = logging.getLogger(__name__)
 
-class NarrativeAgent(BaseAgent):
+class NarrativeAgent(UnifiedBaseAgent):
     AGENT_TYPE = "narrative"
     
     def __init__(self, llm_config=None):
-        super().__init__(
+        super().__init__(, capabilities=self._get_capabilities(), tags=self._get_tags())
             agent_id="narrative-agent-001",
             name="Narrative Agent",
             description="Generates data-driven stories and explanations",
