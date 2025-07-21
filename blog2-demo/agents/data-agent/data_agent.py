@@ -17,10 +17,12 @@ class DataAgent(UnifiedBaseAgent):
     AGENT_TYPE = "data"
     
     def __init__(self, llm_config=None):
-        super().__init__(, capabilities=self._get_capabilities(), tags=self._get_tags())
+        super().__init__(
             agent_id="data-agent-001",
             name="Data Agent",
             description="Provides intelligent access to renewable energy datasets with semantic understanding",
+            capabilities=self._get_capabilities(),
+            tags=self._get_tags(),
             llm_config=llm_config
         )
         self.data_path = os.path.join(os.path.dirname(__file__), "data", "renewable_energy.csv")
@@ -723,3 +725,19 @@ Respond with JSON:
                     comparisons["findings"].append(f"{country_data['country']}: Hydro-dominant ({hydro_pct:.1f}%)")
         
         return comparisons
+    
+    @staticmethod
+    def _get_capabilities():
+        """Return agent capabilities"""
+        return [
+            "Query renewable energy data",
+            "Analyze energy trends",
+            "Aggregate data by country/year",
+            "Calculate growth rates",
+            "Access to historical data"
+        ]
+    
+    @staticmethod
+    def _get_tags():
+        """Return agent tags"""
+        return ["data", "analytics", "renewable-energy", "statistics"]

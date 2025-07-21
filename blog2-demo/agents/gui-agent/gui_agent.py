@@ -4,6 +4,8 @@ import json
 import logging
 import httpx
 import os
+import sys
+sys.path.append('/app/shared')
 from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 from llm import LLMConfig
