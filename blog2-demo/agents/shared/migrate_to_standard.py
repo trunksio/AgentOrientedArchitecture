@@ -6,9 +6,9 @@ import sys
 
 # Template for updating agent imports
 AGENT_IMPORT_TEMPLATE = """from typing import List, Dict, Any, Optional
-from .unified_base_agent import UnifiedBaseAgent
-from .mcp.schemas import MCPTool, ToolParameter, ParameterType
-from .llm import LLMConfig
+from unified_base_agent import UnifiedBaseAgent
+from mcp.schemas import MCPTool, ToolParameter, ParameterType
+from llm import LLMConfig
 """
 
 # Template for updating main.py to use StandardAgentRunner
