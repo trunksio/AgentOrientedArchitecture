@@ -11,8 +11,8 @@ import httpx
 from datetime import datetime
 from pydantic import BaseModel
 
-from .llm import LLMConfig
-from .models import A2AMessage, MessageType
+from llm import LLMConfig
+from models import A2AMessage, MessageType
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

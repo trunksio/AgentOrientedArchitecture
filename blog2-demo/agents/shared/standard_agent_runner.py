@@ -10,9 +10,9 @@ import uvicorn
 import httpx
 from datetime import datetime
 
-from .llm import LLMConfig
-from .models import A2AMessage, MessageType
-from .standard_schemas import (
+from llm import LLMConfig
+from models import A2AMessage, MessageType
+from standard_schemas import (
     A2AMessageRequest, A2AMessageResponse,
     AgentCardResponse, HealthResponse,
     MCPToolsResponse, MCPExecuteRequest, MCPExecuteResponse,

@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional, Tuple
 import logging
 import json
-from .mcp.schemas import MCPTool, ToolResult, ToolParameter
-from .mcp.tool_registry import MCPToolRegistry
-from .llm import LLMClient, LLMConfig
-from .models import A2AMessage, MessageType
+from mcp.schemas import MCPTool, ToolResult, ToolParameter
+from mcp.tool_registry import MCPToolRegistry
+from llm import LLMClient, LLMConfig
+from models import A2AMessage, MessageType
 
 logger = logging.getLogger(__name__)
 
