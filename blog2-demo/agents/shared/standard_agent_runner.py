@@ -27,8 +27,12 @@ class StandardAgentRunner:
     
     def __init__(self, agent_class, agent_instance=None):
         self.agent_class = agent_class
-        self.port = int(os.getenv("PORT", "8080"))
+        self.port = int(os.getenv("AGENT_PORT", os.getenv("PORT", "8080")))
         self.registry_url = os.getenv("A2A_REGISTRY_URL", "http://localhost:8000")
+        self.agent_id = os.getenv("AGENT_ID", None)  # Can be overridden by env var
+        self.registration_status = "pending"  # pending, registered, failed
+        self.registration_attempts = 0
+        self.registration_error = None
         
         # Initialize agent with LLM config from environment
         if agent_instance:
@@ -108,6 +112,9 @@ class StandardAgentRunner:
             
             capabilities.append(capability)
         
+        # Use AGENT_ID from environment if set, otherwise use agent's ID
+        agent_id = self.agent_id if self.agent_id else self.agent.agent_id
+        
         # Map agent IDs to container names
         container_names = {
             "data-agent-001": "data-agent",
@@ -116,11 +123,11 @@ class StandardAgentRunner:
             "narrative-agent-001": "narrative-agent",
             "gui-agent-001": "gui-agent"
         }
-        container_name = container_names.get(self.agent.agent_id, self.agent.agent_id)
+        container_name = container_names.get(agent_id, agent_id)
         
         # Prepare registration data
         registration_data = {
-            "id": self.agent.agent_id,
+            "id": agent_id,
             "name": self.agent.name,
             "type": agent_type,
             "description": self.agent.description,
@@ -148,11 +155,13 @@ class StandardAgentRunner:
         except Exception as e:
             logger.error(f"Cannot reach backend at {self.registry_url}: {type(e).__name__}: {e}")
         
-        # Try to register with the A2A registry
-        max_retries = 10
+        # Try to register with the A2A registry with exponential backoff
+        base_retry_interval = 1  # Start with 1 second
+        max_retry_interval = 60  # Maximum 60 seconds
         retry_count = 0
         
-        while retry_count < max_retries:
+        while True:  # Retry indefinitely until successful
+            self.registration_attempts += 1
             try:
                 async with httpx.AsyncClient(timeout=30.0) as client:
                     logger.debug(f"Sending registration data: {json.dumps(registration_data, indent=2)}")
@@ -166,26 +175,41 @@ class StandardAgentRunner:
                         result = response.json()
                         logger.debug(f"Registration response: {result}")
                         if result.get("success"):
-                            logger.info(f"Successfully registered agent {self.agent.agent_id} with A2A registry")
+                            logger.info(f"Successfully registered agent {agent_id} with A2A registry")
+                            self.registration_status = "registered"
+                            self.registration_error = None
                             return True
                         else:
-                            logger.error(f"Failed to register: {result.get('error')}")
+                            error_msg = f"Failed to register: {result.get('error')}"
+                            logger.error(error_msg)
+                            self.registration_error = error_msg
                     else:
                         error_text = response.text
-                        logger.error(f"Registration failed with status {response.status_code}: {error_text}")
+                        error_msg = f"Registration failed with status {response.status_code}: {error_text}"
+                        logger.error(error_msg)
+                        self.registration_error = error_msg
                         
             except httpx.ConnectError as e:
-                logger.warning(f"Cannot connect to A2A registry at {self.registry_url}, retrying... ({retry_count + 1}/{max_retries})")
+                error_msg = f"Cannot connect to A2A registry at {self.registry_url}"
+                logger.warning(f"{error_msg}, retrying... (attempt {self.registration_attempts})")
                 logger.debug(f"Connection error: {e}")
+                self.registration_error = str(e)
             except Exception as e:
-                logger.error(f"Error registering with A2A: {type(e).__name__}: {e}")
+                error_msg = f"Error registering with A2A: {type(e).__name__}: {e}"
+                logger.error(error_msg)
                 import traceback
                 logger.debug(f"Traceback: {traceback.format_exc()}")
+                self.registration_error = str(e)
+            
+            # Calculate next retry interval with exponential backoff
+            retry_interval = min(base_retry_interval * (2 ** retry_count), max_retry_interval)
+            logger.info(f"Retrying registration in {retry_interval} seconds...")
             
             retry_count += 1
-            await asyncio.sleep(5)  # Wait 5 seconds before retry
+            await asyncio.sleep(retry_interval)
         
-        logger.error(f"Failed to register with A2A registry after {max_retries} attempts")
+        # This line should never be reached since we retry indefinitely
+        self.registration_status = "failed"
         return False
     
     def create_app(self):
@@ -241,21 +265,33 @@ class StandardAgentRunner:
         
         @app.get("/health", response_model=HealthResponse)
         async def health_check():
-            """Get agent health status"""
+            """Get agent health status including registration status"""
             try:
+                # Get base health data if available
                 if hasattr(self.agent, 'get_health_status'):
                     health_data = self.agent.get_health_status()
-                    return HealthResponse(**health_data)
+                else:
+                    # Basic health response
+                    health_data = {
+                        "status": "healthy" if self.registration_status == "registered" else "degraded",
+                        "uptime_seconds": 0,
+                        "request_count": 0,
+                        "error_count": 0,
+                        "error_rate": 0.0,
+                        "llm_available": True
+                    }
                 
-                # Basic health response
-                return HealthResponse(
-                    status="healthy",
-                    uptime_seconds=0,
-                    request_count=0,
-                    error_count=0,
-                    error_rate=0.0,
-                    llm_available=True
-                )
+                # Add registration status information
+                health_data["registration_status"] = self.registration_status
+                health_data["registration_attempts"] = self.registration_attempts
+                if self.registration_error:
+                    health_data["registration_error"] = self.registration_error
+                
+                # Set overall status based on registration
+                if self.registration_status != "registered":
+                    health_data["status"] = "degraded"
+                
+                return HealthResponse(**health_data)
             except Exception as e:
                 logger.error(f"Error checking health: {e}")
                 raise HTTPException(status_code=500, detail=str(e))

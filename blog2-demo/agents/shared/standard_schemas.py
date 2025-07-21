@@ -53,6 +53,9 @@ class HealthResponse(BaseModel):
     error_rate: float = 0.0
     last_error: Optional[str] = None
     llm_available: bool = True
+    registration_status: Optional[str] = None  # pending, registered, failed
+    registration_attempts: Optional[int] = None
+    registration_error: Optional[str] = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class MCPToolsResponse(BaseModel):

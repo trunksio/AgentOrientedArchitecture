@@ -76,6 +76,8 @@ services:
       - ./agents/data-agent/.env
     environment:
       - PYTHONPATH=/app
+      - AGENT_ID=data-agent-001
+      - AGENT_PORT=8081
       - PORT=8081
       - A2A_REGISTRY_URL=http://backend:8000
       - PYTHONUNBUFFERED=1
@@ -96,6 +98,8 @@ services:
       - ./agents/viz-agent/.env
     environment:
       - PYTHONPATH=/app
+      - AGENT_ID=viz-agent-001
+      - AGENT_PORT=8082
       - PORT=8082
       - A2A_REGISTRY_URL=http://backend:8000
       - PYTHONUNBUFFERED=1
@@ -116,6 +120,8 @@ services:
       - ./agents/research-agent/.env
     environment:
       - PYTHONPATH=/app
+      - AGENT_ID=research-agent-001
+      - AGENT_PORT=8083
       - PORT=8083
       - A2A_REGISTRY_URL=http://backend:8000
       - PYTHONUNBUFFERED=1
@@ -136,6 +142,8 @@ services:
       - ./agents/narrative-agent/.env
     environment:
       - PYTHONPATH=/app
+      - AGENT_ID=narrative-agent-001
+      - AGENT_PORT=8084
       - PORT=8084
       - A2A_REGISTRY_URL=http://backend:8000
       - PYTHONUNBUFFERED=1
@@ -156,6 +164,8 @@ services:
       - ./agents/gui-agent/.env
     environment:
       - PYTHONPATH=/app
+      - AGENT_ID=gui-agent-001
+      - AGENT_PORT=8085
       - PORT=8085
       - A2A_REGISTRY_URL=http://backend:8000
       - PYTHONUNBUFFERED=1
