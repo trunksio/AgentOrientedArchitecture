@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: aoa-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - FRONTEND_URL=http://localhost:3000
+      - ANONYMIZED_TELEMETRY=False
+      # LLM Configuration (optional - agents work without LLM but with reduced capabilities)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}  # For Claude 3.5 Sonnet (preferred)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}        # For GPT models (fallback)
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - chromadb
+    networks:
+      - aoa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    container_name: aoa-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: aoa-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - aoa-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Individual Agent Containers
+  data-agent:
+    build:
+      context: .
+      dockerfile: agents/data-agent/Dockerfile
+    container_name: data-agent
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./agents/data-agent/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8081
+      - A2A_REGISTRY_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+  viz-agent:
+    build:
+      context: .
+      dockerfile: agents/viz-agent/Dockerfile
+    container_name: viz-agent
+    ports:
+      - "8082:8082"
+    env_file:
+      - ./agents/viz-agent/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8082
+      - A2A_REGISTRY_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+  research-agent:
+    build:
+      context: .
+      dockerfile: agents/research-agent/Dockerfile
+    container_name: research-agent
+    ports:
+      - "8083:8083"
+    env_file:
+      - ./agents/research-agent/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8083
+      - A2A_REGISTRY_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+  narrative-agent:
+    build:
+      context: .
+      dockerfile: agents/narrative-agent/Dockerfile
+    container_name: narrative-agent
+    ports:
+      - "8084:8084"
+    env_file:
+      - ./agents/narrative-agent/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8084
+      - A2A_REGISTRY_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+  gui-agent:
+    build:
+      context: .
+      dockerfile: agents/gui-agent/Dockerfile
+    container_name: gui-agent
+    ports:
+      - "8085:8085"
+    env_file:
+      - ./agents/gui-agent/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8085
+      - A2A_REGISTRY_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aoa-network
+
+networks:
+  aoa-network:
+    driver: bridge
+
+volumes:
+  chromadb_data:
+    driver: local
