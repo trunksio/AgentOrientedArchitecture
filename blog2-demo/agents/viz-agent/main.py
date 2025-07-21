@@ -1,11 +1,16 @@
-"""Visualization Agent main entry point"""
-import sys
-sys.path.append('/app/shared')
-
 import asyncio
-from agent_runner import AgentRunner
-from viz_agent import VisualizationAgent
+import sys
+import os
+
+# Add parent directory to path to import shared modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from shared.standard_agent_runner import StandardAgentRunner
+from viz_agent import VizAgent
+
+async def main():
+    runner = StandardAgentRunner(VizAgent)
+    await runner.run()
 
 if __name__ == "__main__":
-    runner = AgentRunner(VisualizationAgent)
-    asyncio.run(runner.run())
+    asyncio.run(main())

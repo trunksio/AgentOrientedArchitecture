@@ -18,6 +18,7 @@ from mcp.schemas import ToolExecution
 from startup_agents import register_startup_agents
 from agents.distributed_agent_manager import DistributedAgentManager
 from websocket_manager import ws_manager
+from standard_agent_endpoints import create_agent_router
 
 # Global registries
 a2a_registry = None
@@ -44,6 +45,11 @@ async def lifespan(app: FastAPI):
     
     # No need to register agents here - they self-register when containers start
     print("Started AOA Demo Backend")
+    
+    # Add standard agent endpoints after agent_manager is initialized
+    agent_router = create_agent_router(agent_manager)
+    app.include_router(agent_router)
+    
     yield
     # Shutdown
     await agent_manager.stop()
@@ -64,6 +70,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Standard agent router will be added during startup
 
 @app.get("/")
 async def root():

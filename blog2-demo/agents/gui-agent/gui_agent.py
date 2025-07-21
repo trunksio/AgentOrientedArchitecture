@@ -1,19 +1,17 @@
-import sys
-sys.path.append("/app/shared")
 """GUI Agent - Orchestrates other agents and manages UI composition"""
 from typing import Dict, Any, List, Optional
 import json
 import logging
 import httpx
 import os
-from base_agent import BaseAgent
+from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 from llm import LLMConfig
 from models import MessageType
 
 logger = logging.getLogger(__name__)
 
-class GUIAgent(BaseAgent):
+class GUIAgent(UnifiedBaseAgent):
     AGENT_TYPE = "gui"
     
     def __init__(self, llm_config=None):
@@ -21,10 +19,26 @@ class GUIAgent(BaseAgent):
             agent_id="gui-agent-001",
             name="GUI Agent",
             description="Orchestrates other agents and manages the user interface",
+            capabilities=self._get_capabilities(),
+            tags=self._get_tags(),
             llm_config=llm_config
         )
         # Get backend URL for distributed A2A messaging
         self.backend_url = os.getenv("A2A_REGISTRY_URL", "http://backend:8000")
+    
+    def _get_capabilities(self) -> List[str]:
+        """Get agent capabilities"""
+        return [
+            "Query orchestration",
+            "Multi-agent coordination",
+            "UI composition",
+            "Agent discovery",
+            "Result aggregation"
+        ]
+    
+    def _get_tags(self) -> List[str]:
+        """Get agent tags"""
+        return ["orchestration", "gui", "coordination", "frontend"]
     
     def _register_tools(self):
         """Register MCP tools for orchestration"""

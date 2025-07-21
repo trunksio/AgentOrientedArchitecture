@@ -1,17 +1,25 @@
 """Visualization Agent - Creates charts and visual representations"""
 from typing import Dict, Any, List
-from .base_agent import BaseAgent
+from .unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 import json
 
-class VisualizationAgent(BaseAgent):
+class VisualizationAgent(UnifiedBaseAgent):
     AGENT_TYPE = "visualization"
     
     def __init__(self):
         super().__init__(
             agent_id="viz-agent-001",
             name="Visualization Agent",
-            description="Creates charts, graphs, and visual representations of data"
+            description="Creates charts, graphs, and visual representations of data",
+            capabilities=[
+                "Create interactive charts",
+                "Generate data visualizations",
+                "Design comparison charts",
+                "Build trend visualizations",
+                "Create custom dashboards"
+            ],
+            tags=["visualization", "charts", "ui", "graphics"]
         )
     
     def _register_tools(self):

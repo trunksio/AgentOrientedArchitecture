@@ -6,18 +6,18 @@ import sys
 import json
 import logging
 sys.path.append('/app/shared')
-from base_agent import BaseAgent
+from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
 from llm import LLMConfig
 from models import A2AMessage, MessageType
 
 logger = logging.getLogger(__name__)
 
-class DataAgent(BaseAgent):
+class DataAgent(UnifiedBaseAgent):
     AGENT_TYPE = "data"
     
     def __init__(self, llm_config=None):
-        super().__init__(
+        super().__init__(, capabilities=self._get_capabilities(), tags=self._get_tags())
             agent_id="data-agent-001",
             name="Data Agent",
             description="Provides intelligent access to renewable energy datasets with semantic understanding",
