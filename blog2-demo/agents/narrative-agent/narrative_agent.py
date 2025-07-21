@@ -14,10 +14,12 @@ class NarrativeAgent(UnifiedBaseAgent):
     AGENT_TYPE = "narrative"
     
     def __init__(self, llm_config=None):
-        super().__init__(, capabilities=self._get_capabilities(), tags=self._get_tags())
+        super().__init__(
             agent_id="narrative-agent-001",
             name="Narrative Agent",
             description="Generates data-driven stories and explanations",
+            capabilities=self._get_capabilities(),
+            tags=self._get_tags(),
             llm_config=llm_config
         )
     
@@ -396,3 +398,19 @@ export default function NarrativeStory() {{
   );
 }}
 '''
+
+    @staticmethod
+    def _get_capabilities():
+        """Return agent capabilities"""
+        return [
+            "Generate data stories",
+            "Create narrative explanations",
+            "Produce insights summaries",
+            "Write trend analysis",
+            "Craft compelling narratives"
+        ]
+    
+    @staticmethod
+    def _get_tags():
+        """Return agent tags"""
+        return ["narrative", "storytelling", "content", "writing"]

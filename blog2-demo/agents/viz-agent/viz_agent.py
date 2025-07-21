@@ -1,6 +1,6 @@
+"""Visualization Agent - Creates intelligent charts and visual representations"""
 import sys
 sys.path.append("/app/shared")
-"""Visualization Agent - Creates intelligent charts and visual representations"""
 from typing import Dict, Any, List, Optional
 from unified_base_agent import UnifiedBaseAgent
 from mcp.schemas import MCPTool, ToolParameter, ParameterType
@@ -11,7 +11,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class VisualizationAgent(BaseAgent):
+class VisualizationAgent(UnifiedBaseAgent):
     AGENT_TYPE = "visualization"
     
     def __init__(self, llm_config=None):

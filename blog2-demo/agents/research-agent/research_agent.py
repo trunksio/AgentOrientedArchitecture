@@ -14,10 +14,12 @@ class ResearchAgent(UnifiedBaseAgent):
     AGENT_TYPE = "research"
     
     def __init__(self, llm_config=None):
-        super().__init__(, capabilities=self._get_capabilities(), tags=self._get_tags())
+        super().__init__(
             agent_id="research-agent-001",
             name="Research Agent",
             description="Gathers external context and insights about renewable energy",
+            capabilities=self._get_capabilities(),
+            tags=self._get_tags(),
             llm_config=llm_config
         )
     
@@ -312,3 +314,19 @@ Provide actionable insights that consider market dynamics, technology trends, an
             "confidence": "high" if insights else "low",
             "generated_by": "research-agent"
         }
+    
+    @staticmethod
+    def _get_capabilities():
+        """Return agent capabilities"""
+        return [
+            "Research industry trends",
+            "Find policy information",
+            "Gather market insights",
+            "Analyze technology developments",
+            "Provide contextual information"
+        ]
+    
+    @staticmethod
+    def _get_tags():
+        """Return agent tags"""
+        return ["research", "insights", "context", "analysis"]

@@ -6,10 +6,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.standard_agent_runner import StandardAgentRunner
-from viz_agent import VizAgent
+from viz_agent import VisualizationAgent
 
 async def main():
-    runner = StandardAgentRunner(VizAgent)
+    runner = StandardAgentRunner(VisualizationAgent)
     await runner.run()
 
 if __name__ == "__main__":
